@@ -33,7 +33,8 @@ def correct_data():
         tmp = file.readline()
         if (len(tmp) == 0):
             break
-        if (tmp.find("Island") == -1 and tmp.find("Shore") == -1):
+        #if (tmp.find("Island") == -1 and tmp.find("Shore") == -1):
+        if(tmp.find("Shelf") == -1 ):
             tmp = tmp.split("\t")
             if (tmp[1] != "X" and tmp[1] != "Y" and tmp[1] != '' and tmp[9] != '' and tmp[5] != '' and tmp[10] != 'classC' and tmp[10] != 'classD'):
                 dict[tmp[0]] = tmp[1:]
@@ -184,20 +185,27 @@ def MANOVA_analysis(dict_cpg_bop, dict_bop_cpg):
                     dict_BoP_PValue[bop] = []
                     dict_BoP_PValue[bop].append(line)
     file = open("DataFrame.txt", "w")
+    print(len(dict_BoP_PValue))
+    num = 0
     for key in dict_BoP_PValue:
+        print(num)
+        num += 1
         dict = {}
         pVal = []
-
         l = len(dict_BoP_PValue[key])
         for i in range(0, l - 2):
             cpg1 = []
             cpg2 = []
             cpg3 = []
 
-            for j in range(len(dict_BoP_PValue[key][i])):
-                cpg1.append(float(dict_BoP_PValue[key][i][j]))
-                cpg2.append(float(dict_BoP_PValue[key][i+1][j]))
-                cpg3.append(float(dict_BoP_PValue[key][i+2][j]))
+            cpg1 = list(np.float_(dict_BoP_PValue[key][i]))
+            cpg2 = list(np.float_(dict_BoP_PValue[key][i+1]))
+            cpg3 = list(np.float_(dict_BoP_PValue[key][i+2]))
+
+            #for j in range(len(dict_BoP_PValue[key][i])):
+            #    cpg1.append(float(dict_BoP_PValue[key][i][j]))
+            #    cpg2.append(float(dict_BoP_PValue[key][i+1][j]))
+            #    cpg3.append(float(dict_BoP_PValue[key][i+2][j]))
 
             DatFrame = pd.DataFrame({'age': age,
                               'cpg1' : cpg1,
@@ -253,8 +261,15 @@ def main():
     dict = correct_data()
     cpg_bop = get_dict_cpg_bop(dict)
     bop_cpg = get_dict_bop_cpg(cpg_bop)
+    print(len(bop_cpg))
     res = MANOVA_analysis(cpg_bop, bop_cpg)
+    
     print(res)
+    print(len(res))
 
+    file = open("result.txt", 'w')
+    for key in res:
+        file.write(str(key) + " " + str(res[key]) + "\n")
+    file.close()
 
 main()
